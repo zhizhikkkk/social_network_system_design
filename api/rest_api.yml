@@ -1,0 +1,704 @@
+openapi: 3.0.3
+info:
+  title: Swagger Social Network - OpenAPI 3.0
+  description: |-
+    This is a sample Social Network. 
+ 
+  version: 1.0.0
+servers:
+  - url: https://socialnetwork.swagger.io/api/v1
+tags:
+  - name: user
+    description: Operations about user
+paths:
+  
+
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /user/{username}:
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      description: ''
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - user
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+  /user/friends:
+    get:
+      tags:
+        - user
+      summary: Get list of friends
+      description: Returns the list of friends for the specific user.
+      operationId: getFriends
+      parameters:
+        - name: username
+          in: query
+          description: 'The username whose friends need to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+  /user/friends/{username}:        
+    delete:
+      tags:
+        - user
+      summary: Delete friend.
+      description: Delete friend by username for specific user.
+      operationId: deleteFriend
+      parameters:
+        - name: username
+          in: path
+          description: 'The username who need to be deleted from friends list'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Friend successfully deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Friend deleted successfully.
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    post:
+      tags:
+        - user
+      summary: Add new friend
+      description: Add new friend by username for specific user.
+      operationId: addFriend
+      parameters:
+        - name: username
+          in: path
+          description: 'The username who need to be added as a new friend'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Friend successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Friend added successfully
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+  /posts:
+    post:
+      tags:
+        - posts
+      summary: Create a post
+      operationId: createPost
+      requestBody:
+        description: Data to create a new post.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '201':
+          description: Post created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid post data.     
+  /posts/upload:
+    post:
+      tags:
+        - posts
+      summary: Upload a media file
+      description: Uploads a media file to be used in posts.
+      operationId: uploadMedia
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The media file to upload
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileUrl:
+                    type: string
+                    description: The URL of the uploaded file.
+                    example: 'https://example.com/uploads/image.jpg'
+        '400':
+          description: Invalid file format or size.
+        '500':
+          description: Internal server error.
+  /posts/home:
+    get:
+      tags:
+        - posts
+      summary: Get home feed
+      description: Returns posts from the user's friends with pagination.
+      operationId: getHomeFeed
+      parameters:
+        - name: limit
+          in: query
+          description: Number of posts to retrieve.
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: offset
+          in: query
+          description: Number of posts to skip.
+          required: false
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: Home feed retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '401':
+          description: User not authenticated.
+        '500':
+          description: Internal server error.
+  /users/{username}/posts:
+    get:
+      tags:
+        - posts
+      summary: Get posts of a specific user
+      description: Returns posts created by the specified user.
+      operationId: getUserPosts
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user whose posts need to be retrieved.
+          required: true
+          schema:
+            type: string
+        - name: visibility
+          in: query
+          description: Filter posts by visibility (public, friends-only).
+          required: false
+          schema:
+            type: string
+            enum: [public, friends-only, private]
+        - name: startDate
+          in: query
+          description: Retrieve posts starting from this date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2023-01-01T00:00:00Z'
+        - name: endDate
+          in: query
+          description: Retrieve posts up to this date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2023-12-31T23:59:59Z'
+      responses:
+        '200':
+          description: User's posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
+          
+  /newsfeed:
+    get:
+      tags:
+        - feed
+      summary: Get news feed
+      description: Returns the user's news feed with pagination.
+      operationId: getNewsFeed
+      parameters:
+        - name: limit
+          in: query
+          description: Number of posts to retrieve.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          description: Number of posts to skip.
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: sort
+          in: query
+          description: Sorting order (newest, popular).
+          required: false
+          schema:
+            type: string
+            enum: [newest, popular]
+            default: newest
+      responses:
+        '200':
+          description: News feed retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '401':
+          description: User not authenticated.
+        '500':
+          description: Internal server error.
+  /chats:
+    get:
+      tags:
+        - chats
+      summary: Get user chats
+      description: Returns a list of chats where the user is a participant.
+      operationId: getUserChats
+      responses:
+        '200':
+          description: Chats retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+        '401':
+          description: User not authenticated.
+        '500':
+          description: Internal server error.
+          
+  /chats/{chatId}/messages:
+    get:
+      tags:
+        - messages
+      summary: Get messages from a chat
+      description: Retrieves messages from a specific chat with pagination.
+      operationId: getMessages
+      parameters:
+        - name: chatId
+          in: path
+          description: ID of the chat to retrieve messages from.
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Number of messages to retrieve.
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          description: Number of messages to skip.
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Messages retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '404':
+          description: Chat not found.
+        '500':
+          description: Internal server error.
+    post:
+      tags:
+        - messages
+      summary: Send a message
+      description: Sends a message to a specific chat.
+      operationId: sendMessage
+      parameters:
+        - name: chatId
+          in: path
+          description: ID of the chat to send the message to.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Data for the message to send.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: Message sent successfully.
+        '404':
+          description: Chat not found.
+        '500':
+          description: Internal server error.
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+        friends:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          description: List of user's friends
+          example:
+            - id: 11
+              username: friend1
+              firstName: Alice
+              lastName: Johnson
+            - id: 12
+              username: friend2
+              firstName: Bob
+              lastName: Smith
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+          description: Posts of user
+          example:
+            - id: 111
+              content: "sdklflsdfs"
+              mediaUrls: ['https://example.com/image.jpg','https://example.com/image1.jpg']
+              visibility: 'public'
+            - id: 1112
+              content: "sdklflsdfs"
+              mediaUrls: ['https://example.com/image.jpg','https://example.com/image1.jpg']
+              visibility: 'private' 
+      xml:
+        name: user
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        authorId:
+          type: integer
+          format: int64
+          description: "ID of the user who create the post."
+          example: 123
+        content:
+          type: string
+          description: "The text content of the post"
+          example: "Yo sobaki ia naruto udzumaki"
+        mediaUrls:
+          type: array
+          items:
+            type: string
+          description: "URLS for media files attached to the post."
+          example: ['https://example.com/image.jpg','https://example.com/image1.jpg']
+        visibility:
+          type: string
+          description: 'Visibility of the post (public, friends-only, private).'
+          enum: [public, friends-only, private]
+          example: 'public'
+          
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique ID of the chat.
+          example: 123
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          description: List of users in the chat.
+        lastMessage:
+          type: object
+          $ref: '#/components/schemas/Message'
+        createdAt:
+          type: string
+          format: date-time
+          description: Time when the chat was created.
+          example: '2023-01-01T00:00:00Z'
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique ID of the message.
+          example: 456
+        chatId:
+          type: integer
+          format: int64
+          description: ID of the chat the message belongs to.
+          example: 123
+        senderId:
+          type: integer
+          format: int64
+          description: ID of the user who sent the message.
+          example: 789
+        content:
+          type: string
+          description: Content of the message.
+          example: "Hello, how are you?"
+        mediaUrls:
+          type: array
+          items:
+            type: string
+          description: List of media files attached to the message.
+          example: ["https://example.com/image.jpg"]
+        timestamp:
+          type: string
+          format: date-time
+          description: Time when the message was sent.
+          example: '2023-01-22T10:00:00Z'  
+
+  requestBodies:
+   
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
